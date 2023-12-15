@@ -6,7 +6,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import source.loss as module_loss
 import source.metric as module_metric
 import source.model as module_arch
 from source.trainer import Trainer
