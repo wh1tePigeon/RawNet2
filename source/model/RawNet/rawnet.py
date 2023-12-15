@@ -43,11 +43,14 @@ class RawNet(nn.Module):
         
         
         
-    def forward(self, x, y = None, is_test=False):
+    def forward(self, x):
         x = x.view(x.shape[0], 1, x.shape[1])
         
         x = self.Sinc_conv(x)
-        x = F.max_pool1d(torch.abs(x), 3)
+
+        x = torch.abs(x)
+
+        x = F.max_pool1d(x, 3)
         x = self.bn(x)
         x = self.lrelu(x)
         
@@ -64,11 +67,7 @@ class RawNet(nn.Module):
         x = x.permute(0, 2, 1)
         self.gru.flatten_parameters()
         x, _ = self.gru(x)
-
         x = x[:,-1,:]
-
         x = self.fc(x)
 
-        if not is_test:
-            return x
-        return F.softmax(x, dim=1)
+        return x

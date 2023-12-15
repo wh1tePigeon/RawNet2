@@ -134,8 +134,7 @@ class Trainer(BaseTrainer):
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker):
         batch = self.move_batch_to_device(batch, self.device)
 
-        batch["pred"] = self.model(x=batch["audio"], is_test=not is_train)
-
+        batch["pred"] = self.model(batch["audio"])
         batch["loss"] = self.criterion(batch["pred"], batch["bonafied"])
 
         if is_train:
@@ -145,12 +144,6 @@ class Trainer(BaseTrainer):
             self.optimizer.step()
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
-
-            preds = np.array(batch["pred"].permute(1, 0).detach().cpu())
-            targets = np.array(batch["bonafied"].detach().cpu())
-
-            eer, _ = compute_eer(preds[1][targets == 1], preds[1][targets == 0])
-            self.train_metrics.update("EER", eer)
 
         metrics.update("loss", batch["loss"].item())
         return batch
@@ -177,7 +170,7 @@ class Trainer(BaseTrainer):
                     is_train=False,
                     metrics=self.evaluation_metrics,
                 )
-                preds.extend(list(batch["pred"].permute(1, 0)[1].detach().cpu()))
+                preds.extend(list((batch["pred"].detach().cpu()[:, 1])))
                 targets.extend(list(batch["bonafied"].detach().cpu()))
 
             preds = np.array(preds)

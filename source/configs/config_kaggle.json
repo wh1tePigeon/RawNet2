@@ -12,7 +12,7 @@
   "data": {
     "train": {
       "batch_size": 32,
-      "num_workers": 8,
+      "num_workers": 1,
       "datasets": [
         {
           "type": "ASVDataset",
@@ -25,7 +25,7 @@
     },
     "dev": {
       "batch_size": 32,
-      "num_workers": 8,
+      "num_workers": 1,
       "datasets": [
         {
           "type": "ASVDataset",
@@ -38,7 +38,7 @@
     },
     "eval": {
       "batch_size": 32,
-      "num_workers": 8,
+      "num_workers": 1,
       "datasets": [
         {
           "type": "ASVDataset",
@@ -66,25 +66,21 @@
     }
   ],
   "lr_scheduler": {
-    "type": "OneCycleLR",
+    "type": "ExponentialLR",
     "args": {
-      "steps_per_epoch": 100,
-      "epochs": 100,
-      "anneal_strategy": "cos",
-      "max_lr": 1e-2,
-      "pct_start": 0.2
-    }
+      "gamma": 0.99999
+  }
   },
   "trainer": {
-    "epochs": 100,
+    "epochs": 10,
     "save_dir": "saved/",
-    "save_period": 5,
+    "save_period": 1,
     "verbosity": 2,
     "monitor": "min dev_loss",
     "early_stop": 100,
     "visualize": "wandb",
     "wandb_project": "rawnet_project",
-    "len_epoch": 100,
+    "len_epoch": 5000,
     "grad_norm_clip": 10
   }
 }
