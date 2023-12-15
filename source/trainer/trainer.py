@@ -57,6 +57,7 @@ class Trainer(BaseTrainer):
         self.evaluation_metrics = MetricTracker(
             "loss", *[m.name for m in self.metrics], writer=self.writer
         )
+        self.count = 0
 
     @staticmethod
     def move_batch_to_device(batch, device: torch.device):
@@ -81,6 +82,7 @@ class Trainer(BaseTrainer):
         :param epoch: Integer, current training epoch.
         :return: A log that contains average loss and metric in this epoch.
         """
+        self.count = self.count + 1
         self.model.train()
         self.train_metrics.reset()
         self.writer.add_scalar("epoch", epoch)
@@ -123,9 +125,11 @@ class Trainer(BaseTrainer):
                 break
         log = last_train_metrics
 
-        for part, dataloader in self.evaluation_dataloaders.items():
-            val_log = self._evaluation_epoch(epoch, part, dataloader)
-            log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
+        if self.count == 5:
+            self.count = 0
+            for part, dataloader in self.evaluation_dataloaders.items():
+                val_log = self._evaluation_epoch(epoch, part, dataloader)
+                log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
 
         return log
 
