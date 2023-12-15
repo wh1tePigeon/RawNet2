@@ -136,7 +136,7 @@ class Trainer(BaseTrainer):
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker):
         batch = self.move_batch_to_device(batch, self.device)
 
-        batch["pred"] = self.model(batch["audio"])
+        batch["pred"] = self.model(x=batch["audio"], is_test=not is_train)
 
         batch["loss"] = self.criterion(batch["pred"], batch["bonafied"])
 
