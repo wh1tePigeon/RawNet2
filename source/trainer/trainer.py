@@ -57,7 +57,7 @@ class Trainer(BaseTrainer):
         self.evaluation_metrics = MetricTracker(
             "loss", *[m.name for m in self.metrics], writer=self.writer
         )
-        self.count = 0
+
 
     @staticmethod
     def move_batch_to_device(batch, device: torch.device):
@@ -82,7 +82,6 @@ class Trainer(BaseTrainer):
         :param epoch: Integer, current training epoch.
         :return: A log that contains average loss and metric in this epoch.
         """
-        self.count = self.count + 1
         self.model.train()
         self.train_metrics.reset()
         self.writer.add_scalar("epoch", epoch)
@@ -125,11 +124,10 @@ class Trainer(BaseTrainer):
                 break
         log = last_train_metrics
 
-        if self.count == 5:
-            self.count = 0
-            for part, dataloader in self.evaluation_dataloaders.items():
-                val_log = self._evaluation_epoch(epoch, part, dataloader)
-                log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
+        
+        for part, dataloader in self.evaluation_dataloaders.items():
+            val_log = self._evaluation_epoch(epoch, part, dataloader)
+            log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
 
         return log
 
@@ -147,9 +145,11 @@ class Trainer(BaseTrainer):
             self.optimizer.step()
             if self.lr_scheduler is not None:
                 self.lr_scheduler.step()
-            
-            eer, _ = compute_eer(np.array(batch["bonafied"].detach().cpu()),
-                                 np.array(batch["pred"][:, 0].detach().cpu()))
+
+            preds = np.array(batch["pred"].permute(1, 0).detach().cpu())
+            targets = np.array(batch["bonafied"].detach().cpu())
+
+            eer, _ = compute_eer(preds[1][targets == 1], preds[1][targets == 0])
             self.train_metrics.update("EER", eer)
 
         metrics.update("loss", batch["loss"].item())
@@ -177,12 +177,13 @@ class Trainer(BaseTrainer):
                     is_train=False,
                     metrics=self.evaluation_metrics,
                 )
-                preds.extend(list(batch["pred"][:, 0].detach().cpu()))
+                preds.extend(list(batch["pred"].permute(1, 0)[1].detach().cpu()))
                 targets.extend(list(batch["bonafied"].detach().cpu()))
 
             preds = np.array(preds)
             targets = np.array(targets)
-            eer, _ = compute_eer(targets, preds)
+            
+            eer, _ = compute_eer(preds[targets == 1], preds[targets == 0])
             self.writer.add_scalar("EER", eer)
             self.evaluation_metrics.update("EER", eer)
 

@@ -167,8 +167,8 @@ class EER(BaseMetric):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def __call__(self, target_scores, nontarget_scores):
-        return compute_eer(target_scores, nontarget_scores)
+    def __call__(self, bonafide_scores, other_scores):
+        return compute_eer(bonafide_scores, other_scores)
 
 
 def compute_tDCF(bonafide_score_cm, spoof_score_cm, Pfa_asv, Pmiss_asv,

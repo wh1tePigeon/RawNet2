@@ -33,7 +33,7 @@ class ASVDataset(Dataset):
             if info[3] != '-':
                 sys_id = 1
             key = 1
-            if info[4] == 'spoof':
+            if info[-1] == 'spoof':
                 key = 0
             path = os.path.join(data_dir, info[1] + '.flac')
             self.data_meta.append(ASVMeta(speaker_id=info[0],
