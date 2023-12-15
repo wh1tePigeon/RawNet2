@@ -25,8 +25,6 @@ class ASVDataset(Dataset):
         self._data_dir = data_dir
         self.protocols_path = protocols_path
 
-        self.data_audio = []
-        self.data_target = []
         self.data_meta = []
 
         for line in open(protocols_path).readlines():
@@ -43,21 +41,18 @@ class ASVDataset(Dataset):
                                           path=path,
                                           sys_id=sys_id,
                                           key=key))
-            self.data_target.append(key)
-
-        
-            audio, _ = torchaudio.load(path)
-            audio = audio.squeeze()
-            max = 64000
-            while audio.shape[-1] < max:
-                audio = audio.repeat(2)
-            audio = audio[:max]
-            self.data_audio.append(torch.Tensor(audio))
 
 
     def __getitem__(self, ind):
-        audio = self.data_audio[ind]
-        target = self.data_target[ind]
+        path = self.data_meta[ind].path
+        audio, _ = torchaudio.load(path)
+        audio = audio.squeeze()
+        max = 64000
+        while audio.shape[-1] < max:
+            audio = audio.repeat(2)
+        audio = audio[:max]
+
+        target = self.data_meta[ind].key
         meta = self.data_meta[ind]
         return {
             "audio": audio,
@@ -66,7 +61,7 @@ class ASVDataset(Dataset):
         }
     
     def __len__(self):
-        return len(self.data_audio)
+        return len(self.data_meta)
 
 
 
