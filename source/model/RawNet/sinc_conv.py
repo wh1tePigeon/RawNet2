@@ -74,11 +74,13 @@ class SincConv_fast(nn.Module):
         # Where band_hz is (high_hz - low_hz). Therefore, it is reasonable to
         # do diff and do not set high_hz as sr/2
 
-        mel = np.linspace(self.to_mel(low_hz),
-                          self.to_mel(high_hz),
-                          self.out_channels + 1)
-        hz = self.to_hz(mel)
-
+        #mel = np.linspace(self.to_mel(low_hz),
+        #                  self.to_mel(high_hz),
+        #                  self.out_channels + 1)
+        #hz = self.to_hz(mel)
+        
+        #S3
+        hz = np.linspace(low_hz, high_hz, self.out_channels + 1)
 
         # filter lower frequency (out_channels, 1)
         self.low_hz_ = nn.Parameter(torch.Tensor(hz[:-1]).view(-1, 1)) # learnable f1 from the paper

@@ -9,7 +9,8 @@ URL_LINKS = {
     "main_no_weight_ce": "https://drive.google.com/file/d/1dSil-oF7BG4pPRiVVfoNlLjLB3i9yrKP/view?usp=sharing",
     "main_non_zero_hz": "https://drive.google.com/file/d/1bCjIa8GXMzXdwrW_kQgvGqUpei2F2U1b/view?usp=sharing",
     "main_dif_conv": "https://drive.google.com/file/d/1fXJVCQbAB-8BUdTXlt6fdmb7M9AWLGrR/view?usp=sharing",
-    "main_no_bn": ""
+    "main_no_bn": "",
+    "main_s3" : ""
 }
 
 SAVE_PATH = Path("test_model/")
