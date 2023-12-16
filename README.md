@@ -27,6 +27,8 @@ To test solution run
 ```shell
 python3 test.py
 ```
+## Wandb
+[Wandb report](https://wandb.ai/belki/rawnet_project/reports/RawNet2--Vmlldzo2Mjc5MjQ3?accessToken=1eohvrtqb6toopxyeh64kavy168naeftwnkkp42vaiv2dzeh7bj2wyb9j49pmwye)
 
 ## Credits
 
