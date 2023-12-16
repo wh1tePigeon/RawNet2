@@ -41,8 +41,10 @@ def main(config):
         model = torch.nn.DataParallel(model, device_ids=device_ids)
 
     # get function handles of loss and metrics
-    weight = torch.tensor([1.0, 9.0]).to(device)
-    criterion = nn.CrossEntropyLoss(weight=weight)
+    #check hint
+    #weight = torch.tensor([1.0, 9.0]).to(device)
+    #criterion = nn.CrossEntropyLoss(weight=weight)
+    criterion = nn.CrossEntropyLoss()
     metrics = [
         config.init_obj(metric_dict, module_metric)
         for metric_dict in config["metrics"]
