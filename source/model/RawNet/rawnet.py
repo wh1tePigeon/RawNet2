@@ -61,9 +61,8 @@ class RawNet(nn.Module):
         x = self.res_block5(x)
         x = self.res_block6(x)
         
-        #check hint
-        #x = self.bn_before_gru(x)
-        #x = self.lrelu(x)
+        x = self.bn_before_gru(x)
+        x = self.lrelu(x)
         x = x.permute(0, 2, 1)
         self.gru.flatten_parameters()
         x, _ = self.gru(x)
