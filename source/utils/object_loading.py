@@ -2,21 +2,18 @@ from operator import xor
 
 from torch.utils.data import ConcatDataset, DataLoader
 
-import source.datasets
-from source.utils.parse_config import ConfigParser
+from hydra.utils import instantiate
+from source.datasets.asv_dataset import ASVDataset
 
-
-def get_dataloaders(configs: ConfigParser):
+def get_dataloaders(cfg):
     dataloaders = {}
-    for split, params in configs["data"].items():
+    for split, params in cfg.items():
         num_workers = params.get("num_workers", 1)
         drop_last = False
 
         # create and join datasets
         datasets = []
-        for ds in params["datasets"]:
-            datasets.append(configs.init_obj(
-                ds, source.datasets, config_parser=configs))
+        datasets.append(ASVDataset(params.datasets.data_dir, params.datasets.protocols_path))
         assert len(datasets)
         if len(datasets) > 1:
             dataset = ConcatDataset(datasets)

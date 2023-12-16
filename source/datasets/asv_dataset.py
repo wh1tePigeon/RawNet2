@@ -1,19 +1,10 @@
-import json
 import logging
 import os
-import shutil
-from curses.ascii import isascii
-from pathlib import Path
 import collections
 import torchaudio
 from torch.utils.data import Dataset
 from source.utils.util import ROOT_PATH
-from speechbrain.utils.data_utils import download_file
-from tqdm import tqdm
-from source.utils.parse_config import ConfigParser
-import numpy as np
-import soundfile as sf
-import torch
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +12,7 @@ ASVMeta = collections.namedtuple('ASVMeta',
     ['speaker_id', 'file_name', 'path', 'sys_id', 'key'])
 
 class ASVDataset(Dataset):
-    def __init__(self, data_dir, protocols_path, config_parser: ConfigParser):
+    def __init__(self, data_dir, protocols_path):
         self._data_dir = data_dir
         self.protocols_path = protocols_path
 

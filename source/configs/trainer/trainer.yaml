@@ -1,0 +1,10 @@
+epochs: 10
+save_dir: 'saved/'
+save_period: 1
+verbosity: 2
+monitor: 'min eval_EER'
+early_stop: 100
+visualize: 'wandb'
+wandb_project: 'rawnet_project'
+len_epoch: 5000
+grad_norm_clip: 10

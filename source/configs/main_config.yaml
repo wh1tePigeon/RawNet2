@@ -1,0 +1,10 @@
+defaults:
+  - arch: RawNet2_main
+  - data: ASVDataset
+  - scheduler: scheduler
+  - metrics: eer
+  - trainer: trainer
+  - optimizer: Adam_main
+
+name: main_config
+n_gpu: 1
