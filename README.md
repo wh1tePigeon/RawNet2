@@ -22,8 +22,8 @@ Main model was trained with `source/configs/config_kaggle.json`.
 Checkpoints and training logs can be found [here](https://drive.google.com/drive/folders/1oMc90dS7YGLoC5Emh5pl-hp2wZKzUdft?usp=sharing). To download them use download_model.py script. If you want to test models other than main, make sure you edited code according to model.
 
 
-## Test
-To test solution run
+~~## Test~~
+~~To test solution run~~
 ```shell
 python3 test.py
 ```
