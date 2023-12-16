@@ -6,14 +6,10 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import hydra
-from hydra.utils import instantiate
-from omegaconf import DictConfig
-
 import source.metric as module_metric
 import source.model as module_arch
 from source.trainer import Trainer
-from source.utils import prepare_device, get_logger
+from source.utils import prepare_device
 from source.utils.object_loading import get_dataloaders
 from source.utils.parse_config import ConfigParser
 from source.model.RawNet.rawnet import RawNet
@@ -28,19 +24,18 @@ torch.backends.cudnn.benchmark = False
 np.random.seed(SEED)
 
 
-@hydra.main(config_path='source/configs', config_name='main_config')
-def main(cfg: DictConfig):
-    logger = get_logger("train")
+def main(config):
+    logger = config.get_logger("train")
 
     # setup data_loader instances
-    dataloaders = get_dataloaders(cfg.data)
+    dataloaders = get_dataloaders(config)
 
     # build model architecture, then print to console
-    model = RawNet(cfg.arch)
+    model = RawNet(config["arch"])
     logger.info(model)
 
     # prepare for (multi-device) GPU training
-    device, device_ids = prepare_device(cfg.n_gpu)
+    device, device_ids = prepare_device(config["n_gpu"])
     model = model.to(device)
     if len(device_ids) > 1:
         model = torch.nn.DataParallel(model, device_ids=device_ids)
@@ -49,27 +44,27 @@ def main(cfg: DictConfig):
     weight = torch.tensor([1.0, 9.0]).to(device)
     criterion = nn.CrossEntropyLoss(weight=weight)
     metrics = [
-        instantiate(metric_dict)
-        for metric_dict in cfg.metrics
+        config.init_obj(metric_dict, module_metric)
+        for metric_dict in config["metrics"]
     ]
 
 
     # build optimizer, learning rate scheduler. delete every line containing lr_scheduler for
     # disabling scheduler
     trainable_params = filter(lambda p: p.requires_grad, model.parameters())
-    optimizer = instantiate(cfg.optimizer, trainable_params)
-    lr_scheduler = instantiate(cfg.lr_scheduler, optimizer)
+    optimizer = config.init_obj(config["optimizer"], torch.optim, trainable_params)
+    lr_scheduler = config.init_obj(config["lr_scheduler"], torch.optim.lr_scheduler, optimizer)
     
     trainer = Trainer(
         model=model,
         criterion=criterion,
         metrics=metrics,
         optimizer=optimizer,
-        config=cfg,
+        config=config,
         device=device,
         dataloaders=dataloaders,
         lr_scheduler=lr_scheduler,
-        len_epoch=cfg.trainer.get("len_epoch", None)
+        len_epoch=config["trainer"].get("len_epoch", None)
     )
 
     trainer.train()
@@ -77,4 +72,36 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
-    main()
+    args = argparse.ArgumentParser(description="PyTorch Template")
+    args.add_argument(
+        "-c",
+        "--config",
+        default=None,
+        type=str,
+        help="config file path (default: None)",
+    )
+    args.add_argument(
+        "-r",
+        "--resume",
+        default=None,
+        type=str,
+        help="path to latest checkpoint (default: None)",
+    )
+    args.add_argument(
+        "-d",
+        "--device",
+        default=None,
+        type=str,
+        help="indices of GPUs to enable (default: all)",
+    )
+
+    # custom cli options to modify configuration from default values given in json file.
+    CustomArgs = collections.namedtuple("CustomArgs", "flags type target")
+    options = [
+        CustomArgs(["--lr", "--learning_rate"], type=float, target="optimizer;args;lr"),
+        CustomArgs(
+            ["--bs", "--batch_size"], type=int, target="data_loader;args;batch_size"
+        ),
+    ]
+    config = ConfigParser.from_args(args, options)
+    main(config)
