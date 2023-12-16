@@ -48,7 +48,7 @@ class RawNet(nn.Module):
         
         x = self.Sinc_conv(x)
 
-        #x = torch.abs(x)
+        x = torch.abs(x)
 
         x = F.max_pool1d(x, 3)
         x = self.bn(x)
