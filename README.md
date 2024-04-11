@@ -14,7 +14,7 @@ pip install -r ./requirements.txt
 ## Train 
 Download [dataset](https://www.kaggle.com/datasets/awsaf49/asvpoof-2019-dataset) and specify path to train, dev and eval files and protocols in config. Then run 
 ```shell
-python3 train.py -c "path_to_config"
+python3 train.py -c *path_to_config*
 ```
 Main model was trained with `source/configs/config_kaggle.json`.
 
